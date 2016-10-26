@@ -15,6 +15,7 @@ interface Command
     const COMMAND_PUT_IN_TUBE = 'put-in-tube';
     const COMMAND_USE = 'use';
     const COMMAND_RESERVE = 'reserve';
+    const COMMAND_RESERVE_PAUSE = 'reserve-pause';
     const COMMAND_DELETE = 'delete';
     const COMMAND_RELEASE = 'release';
     const COMMAND_BURY = 'bury';
