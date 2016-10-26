@@ -105,6 +105,19 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testPutInTube()
+    {
+        $command = new Command\PutInTubeCommand('tube3', 'data', 6, 7, 8);
+        $this->_assertCommandLine($command, 'put-in-tube tube3 6 7 8 4', true);
+        $this->assertEquals($command->getData(), 'data');
+
+        $this->_assertResponse(
+            $command->getResponseParser()->parseResponse('INSERTED 5', null),
+            Response::RESPONSE_INSERTED,
+            array('id' => '5')
+        );
+    }
+
     public function testRelease()
     {
         $job = $this->_mockJob(3);

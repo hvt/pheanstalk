@@ -251,9 +251,11 @@ class Pheanstalk implements PheanstalkInterface
         $delay = PheanstalkInterface::DEFAULT_DELAY,
         $ttr = PheanstalkInterface::DEFAULT_TTR
     ) {
-        $this->useTube($tube);
+        $response = $this->_dispatch(
+            new Command\PutInTubeCommand($tube, $data, $priority, $delay, $ttr)
+        );
 
-        return $this->put($data, $priority, $delay, $ttr);
+        return $response['id'];
     }
 
     /**

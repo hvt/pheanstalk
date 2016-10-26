@@ -19,10 +19,10 @@ class PutCommand
     extends AbstractCommand
     implements \Pheanstalk\ResponseParser
 {
-    private $_data;
-    private $_priority;
-    private $_delay;
-    private $_ttr;
+    protected $_data;
+    protected $_priority;
+    protected $_delay;
+    protected $_ttr;
 
     /**
      * Puts a job on the queue.

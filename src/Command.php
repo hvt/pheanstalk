@@ -12,6 +12,7 @@ namespace Pheanstalk;
 interface Command
 {
     const COMMAND_PUT = 'put';
+    const COMMAND_PUT_IN_TUBE = 'put-in-tube';
     const COMMAND_USE = 'use';
     const COMMAND_RESERVE = 'reserve';
     const COMMAND_DELETE = 'delete';
