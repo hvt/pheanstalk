@@ -101,7 +101,12 @@ class FacadeConnectionTest extends \PHPUnit_Framework_TestCase
 
         $pheanstalk->put(__METHOD__);
         $job = $pheanstalk->reserve();
+        $old_job_id = $job->getId();
         $pheanstalk->release($job);
+
+        $job = $pheanstalk->reserve();
+        $this->assertSame($old_job_id, $job->getId());
+        $pheanstalk->delete($job);
     }
 
     public function testPutBuryAndKick()
@@ -145,6 +150,7 @@ class FacadeConnectionTest extends \PHPUnit_Framework_TestCase
         $pheanstalk->put(__METHOD__);
         $job = $pheanstalk->reserve();
         $pheanstalk->touch($job);
+        $pheanstalk->delete($job);
     }
 
     public function testListTubes()
@@ -196,6 +202,7 @@ class FacadeConnectionTest extends \PHPUnit_Framework_TestCase
         $job = $pheanstalk->peekReady();
 
         $this->assertEquals($job->getData(), 'test');
+        $this->assertNull($job->getTube());
 
         // put job in an unused tube
         $id = $pheanstalk->putInTube('testpeekready2', 'test2');
@@ -207,6 +214,7 @@ class FacadeConnectionTest extends \PHPUnit_Framework_TestCase
         $job = $pheanstalk->peekReady('testpeekready2');
 
         $this->assertEquals($job->getData(), 'test2');
+        $this->assertEquals('testpeekready2', $job->getTube());
     }
 
     public function testPeekDelayed()
@@ -370,6 +378,61 @@ class FacadeConnectionTest extends \PHPUnit_Framework_TestCase
             ->reserve(0);
 
         $this->assertSame($response->getData(), __METHOD__);
+    }
+
+    public function testReservePauseTube()
+    {
+        $tube = 'test-reserve-pause-tube';
+        $pheanstalk = $this->_getFacade();
+
+        $job_id = $pheanstalk
+            ->watch($tube)
+            ->ignore('default')
+            ->putInTube($tube, __METHOD__);
+        $this->assertInternalType('int', $job_id);
+
+        $stats_tube = $pheanstalk->statsTube($tube);
+        $this->assertEquals(0, $stats_tube['pause']);
+
+        $job = $pheanstalk->reservePause(60);
+        $this->assertInstanceOf('\Pheanstalk\Job', $job);
+        $this->assertSame($tube, $job->getTube());
+        $this->assertSame(__METHOD__, $job->getData());
+
+        $stats_tube = $pheanstalk->statsTube($tube);
+        $this->assertEquals(60, $stats_tube['pause']);
+
+        $pheanstalk->delete($job);
+    }
+
+    public function testReserveTimeoutPauseTube()
+    {
+        $pheanstalk = $this->_getFacade();
+
+        $tube = 'test-reserve-timeout-pause-tube';
+
+        $job_id = $pheanstalk
+            ->watch($tube)
+            ->ignore('default')
+        ;
+
+        $this->assertFalse($pheanstalk->reservePause(60, 1));
+
+        $job_id = $pheanstalk->putInTube($tube, __METHOD__);
+        $this->assertInternalType('int', $job_id);
+
+        $stats_tube = $pheanstalk->statsTube($tube);
+        $this->assertEquals(0, $stats_tube['pause']);
+
+        $job = $pheanstalk->reservePause(30, 1);
+        $this->assertInstanceOf('\Pheanstalk\Job', $job);
+        $this->assertSame($tube, $job->getTube());
+        $this->assertSame(__METHOD__, $job->getData());
+
+        $stats_tube = $pheanstalk->statsTube($tube);
+        $this->assertEquals(30, $stats_tube['pause']);
+
+        $pheanstalk->delete($job);
     }
 
     public function testGetConnection()

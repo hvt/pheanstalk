@@ -142,6 +142,18 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testReservePause()
+    {
+        $command = new Command\ReservePauseCommand(17);
+        $this->_assertCommandLine($command, 'reserve-pause 17');
+
+        $this->_assertResponse(
+            $command->getResponseParser()->parseResponse('RESERVED_PAUSED tube8 6 9', 'test data'),
+            Response::RESPONSE_RESERVED_PAUSED,
+            array('id' => 6, 'tube' => 'tube8', 'jobdata' => 'test data')
+        );
+    }
+
     public function testUse()
     {
         $command = new Command\UseCommand('tube5');
