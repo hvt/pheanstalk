@@ -183,10 +183,6 @@ interface PheanstalkInterface
     /**
      * Puts a job on the queue using specified tube.
      *
-     * Using this method is equivalent to calling useTube() then put(), with
-     * the added benefit that it will not execute the USE command if the client
-     * is already using the specified tube.
-     *
      * @param string $tube     The tube to use
      * @param string $data     The job data
      * @param int    $priority From 0 (most urgent) to 0xFFFFFFFF (least urgent)
