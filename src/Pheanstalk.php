@@ -190,7 +190,7 @@ class Pheanstalk implements PheanstalkInterface
             new Command\PeekCommand(Command\PeekCommand::TYPE_READY)
         );
 
-        return new Job($response['id'], $response['jobdata']);
+        return new Job($response['id'], $response['jobdata'], $tube);
     }
 
     /**
@@ -206,7 +206,7 @@ class Pheanstalk implements PheanstalkInterface
             new Command\PeekCommand(Command\PeekCommand::TYPE_DELAYED)
         );
 
-        return new Job($response['id'], $response['jobdata']);
+        return new Job($response['id'], $response['jobdata'], $tube);
     }
 
     /**
@@ -222,7 +222,7 @@ class Pheanstalk implements PheanstalkInterface
             new Command\PeekCommand(Command\PeekCommand::TYPE_BURIED)
         );
 
-        return new Job($response['id'], $response['jobdata']);
+        return new Job($response['id'], $response['jobdata'], $tube);
     }
 
     /**
@@ -302,6 +302,26 @@ class Pheanstalk implements PheanstalkInterface
         $this->watchOnly($tube);
 
         return $this->reserve($timeout);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reservePause($delay, $timeout = null)
+    {
+        $response = $this->_dispatch(
+            new Command\ReservePauseCommand($delay, $timeout)
+        );
+
+        $falseResponses = array(
+            Response::RESPONSE_DEADLINE_SOON,
+            Response::RESPONSE_TIMED_OUT,
+        );
+
+        if (in_array($response->getResponseName(), $falseResponses)) {
+            return false;
+        }
+        return new Job($response['id'], $response['jobdata'], $response['tube']);
     }
 
     /**

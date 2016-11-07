@@ -18,15 +18,18 @@ class Job
 
     private $_id;
     private $_data;
+    private $_tube;
 
     /**
      * @param int    $id   The job ID
      * @param string $data The job data
+     * @param string $tube Tube where the job came from (optional)
      */
-    public function __construct($id, $data)
+    public function __construct($id, $data, $tube = null)
     {
         $this->_id = (int) $id;
         $this->_data = $data;
+        $this->_tube = $tube;
     }
 
     /**
@@ -47,5 +50,15 @@ class Job
     public function getData()
     {
         return $this->_data;
+    }
+
+    /**
+     * The job's tube.
+     *
+     * @return string
+     */
+    public function getTube()
+    {
+        return $this->_tube;
     }
 }

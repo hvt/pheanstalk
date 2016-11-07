@@ -246,6 +246,27 @@ interface PheanstalkInterface
     public function reserveFromTube($tube, $timeout = null);
 
     /**
+     * Reserves/locks a ready job in a watched tube, and pauses the tube when the
+     * reservation was successful.
+     * 
+     * Delay says how many seconds the tube where the reserved job came from, should
+     * be paused.
+     *
+     * A non-null timeout uses the 'reserve-with-timeout-pause' instead of 'reserve-pause'.
+     *
+     * A timeout value of 0 will cause the server to immediately return either a
+     * response or TIMED_OUT.  A positive value of timeout will limit the amount of
+     * time the client will block on the reserve request until a job becomes
+     * available.
+     *
+     * @param int $delay
+     * @param int $timeout
+     *
+     * @return object Job
+     */
+    public function reservePause($delay, $timeout = null);
+
+    /**
      * Gives statistical information about the specified job if it exists.
      *
      * @param Job|int $job

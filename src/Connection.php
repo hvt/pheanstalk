@@ -29,6 +29,7 @@ class Connection
     // responses which are followed by data
     private static $_dataResponses = array(
         Response::RESPONSE_RESERVED,
+        Response::RESPONSE_RESERVED_PAUSED,
         Response::RESPONSE_FOUND,
         Response::RESPONSE_OK,
     );
